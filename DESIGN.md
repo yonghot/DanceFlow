@@ -162,3 +162,49 @@
 | Steezy Studio | 댄스 연습 UX 플로우, 분할 화면 |
 | Spotify Wrapped | 성장 기록 시각화, 카드 기반 리포트 |
 | Apple Fitness+ | 운동 중 오버레이 UI, 몰입형 레이아웃 |
+
+## 10. 현재 구현 상태 (2026-02-10)
+
+### shadcn/ui 구현 완료
+
+| 컴포넌트 | 파일 | 커스터마이징 |
+|----------|------|-------------|
+| `Button` | `ui/button.tsx` | `gradient` variant 추가 (gradient-primary) |
+| `Card` | `ui/card.tsx` | 다크 테마 기본 적용 |
+| `Badge` | `ui/badge.tsx` | 등급별 variant (perfect/great/good/ok/miss) |
+| `Progress` | `ui/progress.tsx` | `gradientVariant` prop, 값 클램핑 |
+| `Skeleton` | `ui/skeleton.tsx` | 다크 테마 기본 |
+
+### 커스텀 컴포넌트 구현 완료
+
+| 컴포넌트 | 파일 | 설명 |
+|----------|------|------|
+| `AppShell` | `layout/AppShell.tsx` | Zustand hydration 대기 + 온보딩 리다이렉트 + 조건부 Chrome |
+| `Header` | `layout/Header.tsx` | 로고 + 마이페이지 링크, sticky |
+| `Navigation` | `layout/Navigation.tsx` | 하단 탭 (홈/연습[disabled]/마이) |
+| `ScoreDisplay` | `score/ScoreDisplay.tsx` | 0→최종 점수 카운트업 애니메이션 (1.5s) |
+| `GradeIndicator` | `score/GradeIndicator.tsx` | 등급 배지 + 글로우 효과, sm/lg 사이즈 |
+| `BodyPartScoreDisplay` | `score/BodyPartScore.tsx` | 5부위 점수 리스트 + Progress bar |
+| `JudgementPopup` | `practice/JudgementPopup.tsx` | 실시간 판정 팝업 (PERFECT/GREAT/GOOD), scale+fade 애니메이션 |
+| `ComboCounter` | `practice/ComboCounter.tsx` | 콤보 카운터 (3+표시, 10+ 그라데이션), spring 바운스 |
+| `GradeMessage` | `result/GradeMessage.tsx` | 등급별 한글 축하 메시지, delay 등장 |
+| `ParticleBackground` | `result/ParticleBackground.tsx` | Perfect/Great 등급 파티클 배경 (20개 CSS 파티클) |
+
+### 게임 이펙트 시스템
+
+| 이펙트 | 위치 | 설명 |
+|--------|------|------|
+| 실시간 판정 | 연습 화면 | 품질 95+ PERFECT, 85+ GREAT, 75+ GOOD (0.5초 쿨다운) |
+| 콤보 카운터 | 연습 화면 우상단 | 품질 75+ 연속 시 증가, 60 미만 리셋 |
+| 스켈레톤 글로우 | 연습 화면 | 품질에 따라 관절점 크기/선 두께/투명도 동적 조절, 80+ shadowBlur |
+| 화면 플래시 | 연습 화면 | PERFECT/GREAT 판정 시 0.15초 테두리 플래시 |
+| 프로그레스 바 | 연습 화면 하단 | gradient-primary, 시간 경과 표시 |
+| 파티클 배경 | 결과 화면 | Perfect(골드)/Great(바이올렛-시안) 20개 상승 파티클 |
+| 카드 인터랙션 | 홈 화면 | whileHover scale 1.03, whileTap scale 0.97, stagger 0.08초 |
+
+### 미구현 (P1 이후)
+
+- `SplitView`, `ReferencePlayer`, `PlaybackControls` — 레퍼런스 포즈 데이터 확보 후
+- `BodyPartHeatmap` — 인체 실루엣 시각화
+- `Calendar`, `Tabs` — 마이페이지 확장 시
+- `Dialog`, `Slider`, `Select`, `Avatar`, `Tooltip` — 해당 기능 구현 시

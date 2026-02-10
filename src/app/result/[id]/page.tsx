@@ -9,6 +9,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ScoreDisplay } from '@/components/score/ScoreDisplay';
 import { GradeIndicator } from '@/components/score/GradeIndicator';
 import { BodyPartScoreDisplay } from '@/components/score/BodyPartScore';
+import { GradeMessage } from '@/components/result/GradeMessage';
+import { ParticleBackground } from '@/components/result/ParticleBackground';
 import { usePracticeStore } from '@/stores/practiceStore';
 
 export default function ResultPage() {
@@ -31,11 +33,13 @@ export default function ResultPage() {
   }
 
   return (
-    <div className="px-4 py-8 max-w-lg mx-auto">
+    <div className="relative px-4 py-8 max-w-lg mx-auto">
+      <ParticleBackground grade={currentGrade} />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-8"
+        className="relative z-10 text-center mb-8"
       >
         <p className="text-sm text-muted-foreground mb-1">
           {selectedChoreography.artist}
@@ -49,6 +53,8 @@ export default function ResultPage() {
         <div className="mt-6">
           <GradeIndicator grade={currentGrade} size="lg" />
         </div>
+
+        <GradeMessage grade={currentGrade} />
       </motion.div>
 
       {bodyPartScores.length > 0 && (

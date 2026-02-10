@@ -89,4 +89,49 @@
 
 > 개발 중 발견된 주요 이슈와 해결 방법을 기록하여 재발을 방지합니다.
 
-(아직 기록된 항목 없음)
+### TS-001: Set spread 에러
+
+- **증상**: `[...new Set()]` 구문에서 TypeScript 컴파일 에러
+- **원인**: tsconfig.json에 `target` 미설정 (기본값 ES5에서 Set iterable 미지원)
+- **해결**: `tsconfig.json`에 `"target": "es2017"` 추가
+- **예방**: ES2015+ 기능 사용 시 target 설정 확인 필수
+
+### TS-002: 동적 require 타입 에러
+
+- **증상**: `button.tsx`에서 `const { Slot } = require(...)` 사용 시 ref prop 타입 불일치
+- **원인**: 동적 require는 정확한 타입 추론 불가
+- **해결**: `import { Slot } from '@radix-ui/react-slot'` 정적 import로 변경
+- **예방**: 컴포넌트 import는 반드시 정적 ES module import 사용
+
+### TS-003: 빈 interface ESLint 에러
+
+- **증상**: `interface SkeletonProps extends HTMLAttributes {}` → `@typescript-eslint/no-empty-object-type`
+- **해결**: `type SkeletonProps = React.HTMLAttributes<HTMLDivElement>` type alias로 변경
+- **예방**: 빈 interface 대신 type alias 사용
+
+### TS-004: video.play() 중단 에러
+
+- **증상**: 연습 페이지 진입 시 "The play() request was interrupted by a new load request" 에러
+- **원인**: 페이지 이동/언마운트 시 play() Promise가 reject되면서 `AbortError` 발생
+- **해결**: `useCamera.ts`에서 play() 호출을 try-catch로 감싸고 `AbortError`는 무시 처리
+- **예방**: 비동기 미디어 API 호출 시 AbortError 핸들링 필수
+
+### TS-005: 카메라 에러 원시 메시지 노출
+
+- **증상**: 카메라 접근 실패 시 영문 DOMException 메시지가 사용자에게 그대로 표시
+- **해결**: `NotAllowedError`, `NotFoundError`, `NotReadableError`를 한국어 안내 메시지로 매핑
+- **예방**: 사용자 대면 에러는 항상 한국어 메시지로 변환
+
+### TS-006: vitest v4 + v8 커버리지 0% 버그
+
+- **증상**: 110개 테스트 통과하지만 v8 커버리지 프로바이더가 모든 파일에 0% 보고
+- **원인**: vitest v4.0.18의 v8 커버리지 프로바이더 호환성 버그
+- **해결**: `@vitest/coverage-istanbul` 설치 후 `vitest.config.ts`에서 `provider: 'istanbul'`로 변경
+- **예방**: vitest v4에서는 istanbul 프로바이더 사용 권장
+
+### TS-007: framer-motion Variants ease 타입 에러
+
+- **증상**: `ease: 'easeOut'`이 Variants 타입에서 `string`으로 추론되어 `Easing` 타입 불일치
+- **원인**: 객체 리터럴의 문자열이 넓은 `string` 타입으로 추론됨
+- **해결**: `ease: 'easeOut' as const`로 리터럴 타입 고정
+- **예방**: framer-motion Variants 객체의 ease 값에는 `as const` 사용
