@@ -28,11 +28,12 @@ function Navigation({ className }: NavigationProps) {
   return (
     <nav
       className={cn(
-        'fixed bottom-0 left-0 right-0 z-50 border-t bg-background/80 backdrop-blur-sm',
+        'fixed bottom-0 left-0 right-0 z-50 glass border-t border-neon-pink/10',
         className
       )}
       aria-label="메인 내비게이션"
     >
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-neon-pink/50 to-transparent" />
       <ul className="flex items-center justify-around py-2">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href;
@@ -57,15 +58,18 @@ function Navigation({ className }: NavigationProps) {
               <Link
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center gap-1 px-3 py-1 transition-colors',
+                  'flex flex-col items-center gap-1 px-3 py-1 transition-all duration-200',
                   isActive
-                    ? 'text-primary'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'text-neon-pink scale-110'
+                    : 'text-muted-foreground hover:text-neon-pink'
                 )}
                 aria-current={isActive ? 'page' : undefined}
               >
                 <Icon className="h-5 w-5" aria-hidden="true" />
-                <span className="text-xs">{item.label}</span>
+                <span className="text-xs font-medium">{item.label}</span>
+                {isActive && (
+                  <span className="absolute -bottom-0.5 h-1 w-1 rounded-full bg-neon-pink shadow-neon-pink" />
+                )}
               </Link>
             </li>
           );

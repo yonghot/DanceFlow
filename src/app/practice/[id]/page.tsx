@@ -241,12 +241,12 @@ export default function PracticePage() {
     // 글로우 효과 (품질 80+ 시)
     if (quality >= 80) {
       ctx.shadowBlur = 12 + qualityFactor * 8;
-      ctx.shadowColor = '#7C3AED';
+      ctx.shadowColor = '#FF2D78';
     } else {
       ctx.shadowBlur = 0;
     }
 
-    ctx.fillStyle = `rgba(124, 58, 237, ${alpha})`;
+    ctx.fillStyle = `rgba(255, 45, 120, ${alpha})`;
     for (const lm of currentPose) {
       if (lm.visibility < 0.5) continue;
       ctx.beginPath();
@@ -254,8 +254,8 @@ export default function PracticePage() {
       ctx.fill();
     }
 
-    ctx.shadowColor = '#06B6D4';
-    ctx.strokeStyle = `rgba(6, 182, 212, ${alpha})`;
+    ctx.shadowColor = '#00F0FF';
+    ctx.strokeStyle = `rgba(0, 240, 255, ${alpha})`;
     ctx.lineWidth = lineWidth;
     for (const [i, j] of SKELETON_CONNECTIONS) {
       const a = currentPose[i];
@@ -436,7 +436,7 @@ export default function PracticePage() {
   // 화면 테두리 글로우 (품질 기반)
   const borderGlow =
     practiceState === 'practicing' && currentQuality >= 80
-      ? `inset 0 0 60px rgba(124, 58, 237, ${(currentQuality - 80) * 0.02}), inset 0 0 120px rgba(124, 58, 237, ${(currentQuality - 80) * 0.01})`
+      ? `inset 0 0 60px rgba(255, 45, 120, ${(currentQuality - 80) * 0.02}), inset 0 0 120px rgba(255, 45, 120, ${(currentQuality - 80) * 0.01})`
       : 'none';
 
   return (
@@ -467,7 +467,7 @@ export default function PracticePage() {
             transition={{ duration: 0.15 }}
             className="absolute inset-0 z-10 pointer-events-none"
             style={{
-              boxShadow: 'inset 0 0 80px rgba(124, 58, 237, 0.5), inset 0 0 160px rgba(124, 58, 237, 0.2)',
+              boxShadow: 'inset 0 0 80px rgba(255, 45, 120, 0.5), inset 0 0 160px rgba(0, 240, 255, 0.2)',
             }}
           />
         )}
@@ -513,7 +513,7 @@ export default function PracticePage() {
             exit={{ opacity: 0 }}
             className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black"
           >
-            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+            <Loader2 className="h-8 w-8 animate-spin text-neon-pink mb-4" />
             <p className="text-white/70">카메라 준비 중...</p>
           </motion.div>
         )}
@@ -540,15 +540,15 @@ export default function PracticePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/40"
+            className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/50"
           >
-            <h2 className="text-2xl font-bold text-white mb-2">
+            <h2 className="text-3xl font-bold neon-text-pink mb-2">
               {choreography.title}
             </h2>
             <p className="text-white/70 mb-2">
               {choreography.artist} · {choreography.duration}초
             </p>
-            <p className="text-xs text-white/50 mb-6">
+            <p className="text-xs text-neon-cyan/70 mb-8">
               {referenceFrames.length > 0
                 ? '레퍼런스 비교 모드'
                 : '트래킹 품질 모드'}
@@ -557,7 +557,7 @@ export default function PracticePage() {
               onClick={handleStart}
               size="lg"
               variant="gradient"
-              className="rounded-full px-8 py-6 text-lg"
+              className="rounded-full px-10 py-6 text-lg shadow-neon-pink-lg"
             >
               시작하기
             </Button>
@@ -567,7 +567,7 @@ export default function PracticePage() {
         {practiceState === 'countdown' && (
           <motion.div
             key="countdown"
-            className="absolute inset-0 z-20 flex items-center justify-center bg-black/40"
+            className="absolute inset-0 z-20 flex items-center justify-center bg-black/50"
           >
             <AnimatePresence mode="wait">
               <motion.span
@@ -576,7 +576,7 @@ export default function PracticePage() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 1.5, opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="text-8xl font-extrabold text-white"
+                className="text-9xl font-extrabold neon-text-pink"
               >
                 {countdown}
               </motion.span>
@@ -589,9 +589,9 @@ export default function PracticePage() {
             key="practicing"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="absolute left-1/2 top-4 z-20 -translate-x-1/2 rounded-full bg-black/60 px-6 py-2"
+            className="absolute left-1/2 top-4 z-20 -translate-x-1/2 glass-neon rounded-full px-6 py-2"
           >
-            <span className="text-2xl font-bold tabular-nums text-white">
+            <span className="text-2xl font-bold tabular-nums neon-text-cyan">
               {timeLeft}
             </span>
           </motion.div>
@@ -602,7 +602,7 @@ export default function PracticePage() {
       {practiceState === 'practicing' && (
         <div className="absolute bottom-0 left-0 right-0 z-20 h-1.5 bg-white/10">
           <motion.div
-            className="h-full gradient-primary"
+            className="h-full bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan"
             style={{
               width: `${((choreography.duration - timeLeft) / choreography.duration) * 100}%`,
             }}

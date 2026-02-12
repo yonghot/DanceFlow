@@ -26,13 +26,13 @@ function ComboCounter({ combo }: ComboCounterProps) {
           className="text-5xl font-extrabold tabular-nums"
           style={{
             background: isHighCombo
-              ? 'linear-gradient(135deg, #7C3AED, #06B6D4)'
+              ? 'linear-gradient(135deg, #FF2D78, #00F0FF)'
               : undefined,
             WebkitBackgroundClip: isHighCombo ? 'text' : undefined,
-            WebkitTextFillColor: isHighCombo ? 'transparent' : '#06B6D4',
+            WebkitTextFillColor: isHighCombo ? 'transparent' : '#00F0FF',
             filter: isHighCombo
-              ? 'drop-shadow(0 0 20px rgba(124,58,237,0.6))'
-              : 'drop-shadow(0 0 10px rgba(6,182,212,0.4))',
+              ? 'drop-shadow(0 0 20px rgba(255,45,120,0.6))'
+              : 'drop-shadow(0 0 10px rgba(0,240,255,0.4))',
           }}
         >
           {combo}

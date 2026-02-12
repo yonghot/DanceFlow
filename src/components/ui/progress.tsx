@@ -18,18 +18,20 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
         aria-valuemin={0}
         aria-valuemax={100}
         className={cn(
-          'relative h-4 w-full overflow-hidden rounded-full bg-secondary',
+          'relative h-4 w-full overflow-hidden rounded-full bg-secondary/50',
           className
         )}
         {...props}
       >
         <div
           className={cn(
-            'h-full transition-all',
+            'h-full transition-all relative overflow-hidden',
             gradientVariant ? 'gradient-primary' : 'bg-primary'
           )}
           style={{ width: `${clampedValue}%` }}
-        />
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer bg-[length:200%_100%]" />
+        </div>
       </div>
     );
   }

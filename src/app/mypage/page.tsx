@@ -13,11 +13,11 @@ import { getChoreographyById } from '@/lib/supabase/repos/choreographyRepo';
 import type { PracticeRecord, Grade, Choreography } from '@/types';
 
 const GRADE_COLORS: Record<Grade, string> = {
-  perfect: 'text-grade-perfect',
-  great: 'text-primary',
-  good: 'text-accent',
+  perfect: 'neon-text-gold',
+  great: 'text-neon-pink',
+  good: 'text-neon-cyan',
   ok: 'text-muted-foreground',
-  miss: 'text-destructive',
+  miss: 'text-neon-red',
 };
 
 const GRADE_LABELS: Record<Grade, string> = {
@@ -80,29 +80,29 @@ export default function MyPage() {
   const stats = [
     {
       icon: Trophy,
-      iconColor: 'text-primary',
-      bgColor: 'bg-primary/20',
+      iconColor: 'text-neon-pink',
+      bgColor: 'bg-neon-pink/15',
       value: totalPractices,
       label: '총 연습',
     },
     {
       icon: Flame,
       iconColor: 'text-orange-500',
-      bgColor: 'bg-orange-500/20',
+      bgColor: 'bg-orange-500/15',
       value: `${streak}일`,
       label: '연속 연습',
     },
     {
       icon: TrendingUp,
-      iconColor: 'text-accent',
-      bgColor: 'bg-accent/20',
+      iconColor: 'text-neon-cyan',
+      bgColor: 'bg-neon-cyan/15',
       value: avgScore,
       label: '평균 점수',
     },
     {
       icon: Star,
-      iconColor: 'text-grade-perfect',
-      bgColor: 'bg-grade-perfect/20',
+      iconColor: 'text-neon-gold',
+      bgColor: 'bg-neon-gold/15',
       value: bestScore,
       label: '최고 점수',
     },
@@ -111,7 +111,7 @@ export default function MyPage() {
   return (
     <div className="px-4 py-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">{profile?.nickname ?? '게스트'}</h1>
+        <h1 className="text-2xl font-bold neon-text-pink">{profile?.nickname ?? '게스트'}</h1>
         <p className="text-sm text-muted-foreground">마이페이지</p>
       </div>
 
@@ -123,7 +123,7 @@ export default function MyPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
           >
-            <Card>
+            <Card className="glass border-white/5 hover:border-neon-pink/20 transition-all">
               <CardContent className="flex items-center gap-3 p-4">
                 <div className={`rounded-lg p-2 ${stat.bgColor}`}>
                   <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
@@ -181,7 +181,7 @@ export default function MyPage() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
-                <Card>
+                <Card className="glass border-white/5">
                   <CardContent className="flex items-center justify-between p-4">
                     <div>
                       <p className="font-medium">

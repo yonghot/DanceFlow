@@ -16,10 +16,10 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   advanced: '고급',
 };
 
-const DIFFICULTY_BADGE_STYLES: Record<Difficulty, string> = {
-  beginner: 'bg-accent/20 text-accent border-accent/30',
-  intermediate: 'bg-primary/20 text-primary border-primary/30',
-  advanced: 'bg-destructive/20 text-destructive border-destructive/30',
+const DIFFICULTY_BADGE_VARIANT: Record<Difficulty, 'beginner' | 'intermediate' | 'advanced'> = {
+  beginner: 'beginner',
+  intermediate: 'intermediate',
+  advanced: 'advanced',
 };
 
 const FILTER_OPTIONS: { value: Difficulty | 'all'; label: string }[] = [
@@ -79,23 +79,23 @@ export default function HomePage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="mb-6"
+        className="mb-8 text-center"
       >
-        <h1 className="text-2xl font-bold mb-1">안무 선택</h1>
+        <h1 className="text-3xl font-bold mb-2 neon-text-pink">Dance Like a Star</h1>
         <p className="text-muted-foreground text-sm">연습할 안무를 선택하세요</p>
       </motion.div>
 
-      <div className="flex gap-2 mb-6 overflow-x-auto">
+      <div className="flex gap-2 mb-6 overflow-x-auto justify-center">
         {FILTER_OPTIONS.map((opt) => (
           <motion.button
             key={opt.value}
             onClick={() => setFilter(opt.value)}
             whileTap={{ scale: 0.95 }}
             className={cn(
-              'px-4 py-2 min-h-[44px] rounded-full text-sm font-medium transition-colors whitespace-nowrap touch-manipulation',
+              'px-4 py-2 min-h-[44px] rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap touch-manipulation',
               filter === opt.value
-                ? 'gradient-primary text-white'
-                : 'bg-muted text-muted-foreground hover:text-foreground'
+                ? 'gradient-primary text-white shadow-neon-pink'
+                : 'glass text-muted-foreground hover:text-foreground hover:border-neon-pink/30'
             )}
           >
             {opt.label}
@@ -105,7 +105,7 @@ export default function HomePage() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="h-8 w-8 animate-spin text-neon-pink" />
         </div>
       ) : (
         <motion.div
@@ -122,32 +122,30 @@ export default function HomePage() {
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
               >
-                <Card className="group transition-colors duration-200 hover:border-primary/50">
+                <Card className="group glass border-white/5 hover:border-neon-pink/30 transition-all duration-300 hover:shadow-neon-pink overflow-hidden">
                   <Link href={`/practice/${choreo.id}`}>
-                    <div className="h-40 gradient-energy rounded-t-lg opacity-80 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
-                      <Music className="h-12 w-12 text-white/60" />
+                    <div className="h-40 gradient-energy rounded-t-lg opacity-80 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer relative">
+                      <Music className="h-12 w-12 text-white/60 group-hover:text-white/80 transition-colors" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                     </div>
                   </Link>
                   <CardContent className="p-4">
                     <Link href={`/practice/${choreo.id}`} className="block mb-2">
                       <div className="flex items-start justify-between">
                         <div>
-                          <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                          <h3 className="font-semibold text-foreground group-hover:text-neon-pink transition-colors">
                             {choreo.title}
                           </h3>
                           <p className="text-sm text-muted-foreground">
                             {choreo.artist}
                           </p>
                         </div>
-                        <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0 mt-0.5" />
+                        <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-neon-pink transition-colors flex-shrink-0 mt-0.5" />
                       </div>
                     </Link>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Badge
-                          variant="outline"
-                          className={DIFFICULTY_BADGE_STYLES[choreo.difficulty]}
-                        >
+                        <Badge variant={DIFFICULTY_BADGE_VARIANT[choreo.difficulty]}>
                           {DIFFICULTY_LABELS[choreo.difficulty]}
                         </Badge>
                         <span className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -155,14 +153,14 @@ export default function HomePage() {
                           {formatDuration(choreo.duration)}
                         </span>
                         {choreo.hasReference && (
-                          <Badge variant="outline" className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">
+                          <Badge variant="outline" className="bg-neon-cyan/10 text-neon-cyan border-neon-cyan/30 text-xs">
                             레퍼런스
                           </Badge>
                         )}
                       </div>
                       <Link
                         href={`/reference/${choreo.id}/record`}
-                        className="flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 transition-colors"
+                        className="flex items-center gap-1 text-xs text-neon-gold hover:text-neon-gold/80 transition-colors"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <Video className="h-3.5 w-3.5" />

@@ -9,8 +9,8 @@ const JUDGEMENT_CONFIG: Record<
   { label: string; color: string }
 > = {
   perfect: { label: 'PERFECT!', color: '#FFD700' },
-  great: { label: 'GREAT!', color: '#7C3AED' },
-  good: { label: 'GOOD!', color: '#06B6D4' },
+  great: { label: 'GREAT!', color: '#FF2D78' },
+  good: { label: 'GOOD!', color: '#00F0FF' },
 };
 
 interface JudgementPopupProps {

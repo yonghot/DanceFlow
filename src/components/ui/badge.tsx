@@ -15,11 +15,14 @@ const badgeVariants = cva(
           'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
         outline: 'text-foreground',
         perfect:
-          'bg-grade-perfect/20 text-grade-perfect border-grade-perfect/30',
-        great: 'bg-grade-great/20 text-grade-great border-grade-great/30',
-        good: 'bg-grade-good/20 text-grade-good border-grade-good/30',
+          'bg-neon-gold/15 text-neon-gold border-neon-gold/30 shadow-neon-gold',
+        great: 'bg-neon-pink/15 text-neon-pink border-neon-pink/30 shadow-neon-pink',
+        good: 'bg-neon-cyan/15 text-neon-cyan border-neon-cyan/30 shadow-neon-cyan',
         ok: 'bg-grade-ok/20 text-grade-ok border-grade-ok/30',
-        miss: 'bg-grade-miss/20 text-grade-miss border-grade-miss/30',
+        miss: 'bg-neon-red/15 text-neon-red border-neon-red/30',
+        beginner: 'bg-neon-cyan/15 text-neon-cyan border-neon-cyan/30',
+        intermediate: 'bg-neon-pink/15 text-neon-pink border-neon-pink/30',
+        advanced: 'bg-neon-gold/15 text-neon-gold border-neon-gold/30',
       },
     },
     defaultVariants: {

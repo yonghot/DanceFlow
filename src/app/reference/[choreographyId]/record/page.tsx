@@ -104,8 +104,10 @@ export default function RecordReferencePage(): React.ReactElement {
     canvas.height = videoRef.current.videoHeight || 480;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // 관절점
-    ctx.fillStyle = 'rgba(239, 68, 68, 0.9)';
+    // 관절점 (네온 골드)
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#FFD700';
+    ctx.fillStyle = 'rgba(255, 215, 0, 0.9)';
     for (const lm of currentPose) {
       if (lm.visibility < 0.5) continue;
       ctx.beginPath();
@@ -113,8 +115,9 @@ export default function RecordReferencePage(): React.ReactElement {
       ctx.fill();
     }
 
-    // 연결선
-    ctx.strokeStyle = 'rgba(251, 191, 36, 0.8)';
+    // 연결선 (네온 골드)
+    ctx.shadowColor = '#FFA500';
+    ctx.strokeStyle = 'rgba(255, 215, 0, 0.7)';
     ctx.lineWidth = 3;
     for (const [i, j] of SKELETON_CONNECTIONS) {
       const a = currentPose[i];
@@ -265,7 +268,7 @@ export default function RecordReferencePage(): React.ReactElement {
   // 프리뷰 / 업로드 / 완료 화면
   if (recordingState === 'preview' || recordingState === 'uploading' || recordingState === 'complete') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 bg-grid">
         <button
           onClick={() => router.back()}
           className="absolute top-4 left-4 rounded-full bg-muted p-2 hover:bg-muted/80 transition-colors"
@@ -280,10 +283,10 @@ export default function RecordReferencePage(): React.ReactElement {
             animate={{ opacity: 1, scale: 1 }}
             className="text-center"
           >
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20">
-              <Check className="h-8 w-8 text-green-500" />
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-neon-cyan/20 shadow-neon-cyan">
+              <Check className="h-8 w-8 text-neon-cyan" />
             </div>
-            <h2 className="text-xl font-bold mb-2">레퍼런스 저장 완료!</h2>
+            <h2 className="text-xl font-bold mb-2 neon-text-cyan">레퍼런스 저장 완료!</h2>
             <p className="text-muted-foreground mb-6">
               {choreography.title}의 레퍼런스가 등록되었습니다
             </p>
@@ -363,8 +366,10 @@ export default function RecordReferencePage(): React.ReactElement {
 
       {/* 녹화 중 표시 */}
       {recordingState === 'recording' && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 rounded-full bg-red-600/80 px-4 py-1.5">
-          <div className="h-2.5 w-2.5 rounded-full bg-white animate-pulse" />
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 rounded-full px-4 py-1.5"
+          style={{ background: 'rgba(255, 51, 85, 0.8)', boxShadow: '0 0 15px rgba(255, 51, 85, 0.5), 0 0 30px rgba(255, 51, 85, 0.2)' }}
+        >
+          <div className="h-2.5 w-2.5 rounded-full bg-white animate-neon-pulse" />
           <span className="text-sm font-medium text-white">REC</span>
         </div>
       )}
@@ -395,7 +400,7 @@ export default function RecordReferencePage(): React.ReactElement {
             exit={{ opacity: 0 }}
             className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black"
           >
-            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+            <Loader2 className="h-8 w-8 animate-spin text-neon-gold mb-4" />
             <p className="text-white/70">카메라 준비 중...</p>
           </motion.div>
         )}
@@ -422,13 +427,13 @@ export default function RecordReferencePage(): React.ReactElement {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/40"
+            className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/50"
           >
             <div className="text-center mb-8">
-              <p className="text-sm text-amber-400 font-medium mb-2">
+              <p className="text-sm neon-text-gold font-medium mb-2">
                 레퍼런스 녹화
               </p>
-              <h2 className="text-2xl font-bold text-white mb-2">
+              <h2 className="text-3xl font-bold neon-text-gold mb-2">
                 {choreography.title}
               </h2>
               <p className="text-white/70">
@@ -438,7 +443,8 @@ export default function RecordReferencePage(): React.ReactElement {
             <Button
               onClick={handleStartRecording}
               size="lg"
-              className="rounded-full px-8 py-6 text-lg bg-red-600 hover:bg-red-700 text-white"
+              className="rounded-full px-8 py-6 text-lg text-white shadow-neon-gold"
+              style={{ background: 'linear-gradient(135deg, #FF3355, #FF2D78)' }}
             >
               녹화 시작
             </Button>
@@ -451,7 +457,7 @@ export default function RecordReferencePage(): React.ReactElement {
         {recordingState === 'countdown' && (
           <motion.div
             key="countdown"
-            className="absolute inset-0 z-20 flex items-center justify-center bg-black/40"
+            className="absolute inset-0 z-20 flex items-center justify-center bg-black/50"
           >
             <AnimatePresence mode="wait">
               <motion.span
@@ -460,7 +466,7 @@ export default function RecordReferencePage(): React.ReactElement {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 1.5, opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="text-8xl font-extrabold text-white"
+                className="text-9xl font-extrabold neon-text-gold"
               >
                 {countdown}
               </motion.span>
@@ -474,9 +480,9 @@ export default function RecordReferencePage(): React.ReactElement {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 rounded-full bg-black/60 px-6 py-2"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 glass-neon rounded-full px-6 py-2"
         >
-          <span className="text-2xl font-bold tabular-nums text-white">
+          <span className="text-2xl font-bold tabular-nums neon-text-gold">
             {timeLeft}
           </span>
         </motion.div>
@@ -486,7 +492,7 @@ export default function RecordReferencePage(): React.ReactElement {
       {recordingState === 'recording' && (
         <div className="absolute bottom-0 left-0 right-0 z-20 h-1.5 bg-white/10">
           <motion.div
-            className="h-full bg-red-500"
+            className="h-full bg-gradient-to-r from-neon-red via-neon-pink to-neon-gold"
             style={{
               width: `${((choreography.duration - timeLeft) / choreography.duration) * 100}%`,
             }}

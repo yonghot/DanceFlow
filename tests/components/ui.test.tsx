@@ -46,7 +46,7 @@ describe('Badge', () => {
   it('variant 적용', () => {
     render(<Badge variant="perfect">퍼펙트</Badge>);
     const badge = screen.getByText('퍼펙트');
-    expect(badge.className).toContain('grade-perfect');
+    expect(badge.className).toContain('neon-gold');
   });
 });
 

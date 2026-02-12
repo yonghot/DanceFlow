@@ -21,16 +21,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const showChrome = !isAuthPage && !isImmersivePage;
 
   if (!isHydrated || isLoading) {
-    return <div className="min-h-screen bg-background" />;
+    return <div className="min-h-screen bg-background bg-grid" />;
   }
 
   if (showChrome) {
     return (
-      <>
+      <div className="min-h-screen bg-grid">
         <Header />
         <main className="pb-16">{children}</main>
         <Navigation />
-      </>
+      </div>
     );
   }
 

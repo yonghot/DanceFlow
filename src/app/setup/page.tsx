@@ -51,14 +51,14 @@ export default function SetupPage(): React.ReactElement {
   }, [nickname, stopCamera, router]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6">
-      <div className="flex gap-2 mb-12">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-grid">
+      <div className="flex gap-3 mb-12">
         {(['nickname', 'camera'] as const).map((s, i) => (
           <div
             key={s}
-            className={`h-1.5 w-12 rounded-full transition-colors ${
+            className={`h-2 w-14 rounded-full transition-all duration-300 ${
               i <= (['nickname', 'camera'] as const).indexOf(step)
-                ? 'gradient-primary'
+                ? 'gradient-primary shadow-neon-pink'
                 : 'bg-muted'
             }`}
           />
@@ -74,8 +74,8 @@ export default function SetupPage(): React.ReactElement {
             exit={{ opacity: 0, x: -20 }}
             className="w-full max-w-sm text-center"
           >
-            <Sparkles className="h-12 w-12 text-primary mx-auto mb-4" />
-            <h1 className="text-2xl font-bold mb-2">프로필 설정</h1>
+            <Sparkles className="h-12 w-12 text-neon-pink mx-auto mb-4 animate-neon-pulse" />
+            <h1 className="text-2xl font-bold mb-2 neon-text-pink">프로필 설정</h1>
             <p className="text-muted-foreground mb-8">
               닉네임을 입력해주세요
             </p>
@@ -85,7 +85,7 @@ export default function SetupPage(): React.ReactElement {
               onChange={(e) => setNickname(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="닉네임 (2자 이상)"
-              className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary mb-4"
+              className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-pink focus:border-neon-pink/50 transition-all mb-4"
               maxLength={20}
               autoFocus
             />
@@ -110,8 +110,8 @@ export default function SetupPage(): React.ReactElement {
             exit={{ opacity: 0, x: -20 }}
             className="w-full max-w-sm text-center"
           >
-            <Camera className="h-12 w-12 text-primary mx-auto mb-4" />
-            <h1 className="text-2xl font-bold mb-2">카메라 설정</h1>
+            <Camera className="h-12 w-12 text-neon-cyan mx-auto mb-4 animate-neon-pulse" />
+            <h1 className="text-2xl font-bold mb-2 neon-text-cyan">카메라 설정</h1>
             <p className="text-muted-foreground mb-8">
               댄스 연습을 위해 카메라 권한이 필요합니다
             </p>

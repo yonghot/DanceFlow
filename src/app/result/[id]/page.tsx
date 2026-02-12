@@ -35,7 +35,7 @@ export default function ResultPage() {
   }
 
   return (
-    <div className="relative px-4 py-8 max-w-lg mx-auto">
+    <div className="relative px-4 py-8 max-w-lg mx-auto bg-grid min-h-screen">
       <ParticleBackground grade={currentGrade} />
 
       <motion.div
@@ -46,7 +46,7 @@ export default function ResultPage() {
         <p className="text-sm text-muted-foreground mb-1">
           {selectedChoreography.artist}
         </p>
-        <h1 className="text-xl font-semibold mb-8">
+        <h1 className="text-xl font-semibold mb-8 neon-text-pink">
           {selectedChoreography.title}
         </h1>
 
@@ -65,16 +65,16 @@ export default function ResultPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="mb-6">
+          <Card className="mb-6 glass border-white/5">
             <CardContent className="p-6">
               <h2 className="font-semibold mb-4">점수 상세</h2>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-primary">{accuracyScore}</p>
+                  <p className="text-3xl font-bold neon-text-pink">{accuracyScore}</p>
                   <p className="text-xs text-muted-foreground mt-1">동작 정확도</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-accent">{timingScore}</p>
+                  <p className="text-3xl font-bold neon-text-cyan">{timingScore}</p>
                   <p className="text-xs text-muted-foreground mt-1">박자 일치도</p>
                 </div>
               </div>
@@ -89,7 +89,7 @@ export default function ResultPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Card className="mb-6">
+          <Card className="mb-6 glass border-white/5">
             <CardContent className="p-6">
               <h2 className="font-semibold mb-4">부위별 분석</h2>
               <BodyPartScoreDisplay scores={bodyPartScores} />

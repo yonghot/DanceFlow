@@ -36,7 +36,7 @@ function ParticleBackground({ grade }: ParticleBackgroundProps) {
   const gradient =
     grade === 'perfect'
       ? 'linear-gradient(135deg, #FFD700, #FFA500)'
-      : 'linear-gradient(135deg, #7C3AED, #06B6D4)';
+      : 'linear-gradient(135deg, #FF2D78, #00F0FF)';
 
   return (
     <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
