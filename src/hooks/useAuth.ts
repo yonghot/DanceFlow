@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import { useUserStore } from '@/stores/userStore';
 import type { User } from '@supabase/supabase-js';
 
@@ -20,6 +20,11 @@ export function useAuth(): UseAuthReturn {
   const clearUser = useUserStore((s) => s.clearUser);
 
   useEffect(() => {
+    if (!isSupabaseConfigured()) {
+      setIsLoading(false);
+      return;
+    }
+
     const supabase = createClient();
 
     // 현재 세션 확인

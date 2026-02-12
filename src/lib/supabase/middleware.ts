@@ -7,9 +7,17 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
     request,
   });
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // 환경변수 미설정 시 인증 없이 통과
+  if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('your-supabase')) {
+    return supabaseResponse;
+  }
+
   const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll(): { name: string; value: string }[] {
