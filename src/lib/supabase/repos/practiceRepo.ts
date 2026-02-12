@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/types';
 import type { PracticeRecord, Grade, BodyPartScore } from '@/types';
 
@@ -35,6 +35,7 @@ export async function savePracticeSession(params: {
   frameCount: number;
   durationMs: number;
 }): Promise<string | null> {
+  if (!isSupabaseConfigured()) return null;
   const supabase = createClient();
 
   const { data, error } = await supabase
@@ -68,6 +69,7 @@ export async function getPracticeSessions(
   userId: string,
   limit = 50
 ): Promise<PracticeRecord[]> {
+  if (!isSupabaseConfigured()) return [];
   const supabase = createClient();
 
   const { data, error } = await supabase
@@ -87,6 +89,7 @@ export async function getBestScore(
   userId: string,
   choreographyId: string
 ): Promise<number | null> {
+  if (!isSupabaseConfigured()) return null;
   const supabase = createClient();
 
   const { data, error } = await supabase
@@ -105,6 +108,7 @@ export async function getBestScore(
 
 // 연속 연습일 계산
 export async function getStreak(userId: string): Promise<number> {
+  if (!isSupabaseConfigured()) return 0;
   const supabase = createClient();
 
   const { data, error } = await supabase

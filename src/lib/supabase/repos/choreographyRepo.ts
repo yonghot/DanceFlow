@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/types';
 import type { Choreography } from '@/types';
 
@@ -23,6 +23,7 @@ function toChoreography(
 
 // 전체 안무 목록 조회 (레퍼런스 유무 포함)
 export async function getChoreographies(): Promise<Choreography[]> {
+  if (!isSupabaseConfigured()) return [];
   const supabase = createClient();
 
   const { data: choreos, error } = await supabase
@@ -49,6 +50,7 @@ export async function getChoreographies(): Promise<Choreography[]> {
 export async function getChoreographyById(
   id: string
 ): Promise<Choreography | null> {
+  if (!isSupabaseConfigured()) return null;
   const supabase = createClient();
 
   const { data, error } = await supabase

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import type { CompactPoseData } from '@/types';
 import { compressToGzip, decompressFromGzip } from '@/lib/pose/compression';
 
@@ -9,6 +9,7 @@ export async function uploadPoseData(
   data: CompactPoseData,
   path: string
 ): Promise<string | null> {
+  if (!isSupabaseConfigured()) return null;
   const supabase = createClient();
   const compressed = await compressToGzip(data);
 
@@ -31,6 +32,7 @@ export async function uploadPoseData(
 export async function downloadPoseData(
   path: string
 ): Promise<CompactPoseData | null> {
+  if (!isSupabaseConfigured()) return null;
   const supabase = createClient();
 
   const { data, error } = await supabase.storage

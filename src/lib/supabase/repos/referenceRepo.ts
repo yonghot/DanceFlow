@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/types';
 
 type ReferenceRow = Database['public']['Tables']['reference_poses']['Row'];
@@ -37,6 +37,7 @@ export async function createReference(params: {
   frameCount: number;
   durationMs: number;
 }): Promise<string | null> {
+  if (!isSupabaseConfigured()) return null;
   const supabase = createClient();
 
   const { data, error } = await supabase
@@ -61,6 +62,7 @@ export async function createReference(params: {
 export async function getActiveReferences(
   choreographyId: string
 ): Promise<ReferenceInfo[]> {
+  if (!isSupabaseConfigured()) return [];
   const supabase = createClient();
 
   const { data, error } = await supabase
@@ -79,6 +81,7 @@ export async function getActiveReferences(
 export async function getPrimaryReference(
   choreographyId: string
 ): Promise<ReferenceInfo | null> {
+  if (!isSupabaseConfigured()) return null;
   const supabase = createClient();
 
   // primary가 있으면 우선
@@ -113,6 +116,7 @@ export async function getPrimaryReference(
 export async function getReferenceById(
   id: string
 ): Promise<ReferenceInfo | null> {
+  if (!isSupabaseConfigured()) return null;
   const supabase = createClient();
 
   const { data, error } = await supabase

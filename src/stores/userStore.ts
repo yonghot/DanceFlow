@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { createClient } from '@/lib/supabase/client';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/types';
 
 type ProfileRow = Database['public']['Tables']['profiles']['Row'];
@@ -27,6 +27,10 @@ export const useUserStore = create<UserStore>()((set, get) => ({
   isLoading: true,
 
   fetchProfile: async (userId: string): Promise<void> => {
+    if (!isSupabaseConfigured()) {
+      set({ profile: null, isLoading: false });
+      return;
+    }
     set({ isLoading: true });
     const supabase = createClient();
 
@@ -55,7 +59,7 @@ export const useUserStore = create<UserStore>()((set, get) => ({
 
   updateProfile: async (updates): Promise<void> => {
     const { profile } = get();
-    if (!profile) return;
+    if (!profile || !isSupabaseConfigured()) return;
 
     const supabase = createClient();
     const dbUpdates: Record<string, unknown> = {};
