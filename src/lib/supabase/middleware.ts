@@ -48,7 +48,7 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
   const publicPaths = ['/', '/login', '/signup', '/auth/callback'];
   const isPublic = publicPaths.some(
     (p) => pathname === p || pathname.startsWith('/auth/')
-  );
+  ) || pathname.startsWith('/api/');
 
   // 미인증 + 보호 경로 → 로그인으로 리다이렉트
   if (!user && !isPublic) {
