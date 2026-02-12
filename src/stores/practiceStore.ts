@@ -11,12 +11,16 @@ interface PracticeStore {
   state: PracticeState;
   currentScore: number;
   currentGrade: Grade | null;
+  accuracyScore: number | null;
+  timingScore: number | null;
   bodyPartScores: BodyPartScore[];
   recordedPoses: PoseFrame[];
   selectedChoreography: Choreography | null;
   setState: (state: PracticeState) => void;
   setScore: (score: number) => void;
   setGrade: (grade: Grade) => void;
+  setAccuracyScore: (score: number | null) => void;
+  setTimingScore: (score: number | null) => void;
   setBodyPartScores: (scores: BodyPartScore[]) => void;
   addPoseFrame: (frame: PoseFrame) => void;
   setSelectedChoreography: (choreo: Choreography | null) => void;
@@ -27,6 +31,8 @@ const initialState = {
   state: 'idle' as PracticeState,
   currentScore: 0,
   currentGrade: null,
+  accuracyScore: null as number | null,
+  timingScore: null as number | null,
   bodyPartScores: [],
   recordedPoses: [],
   selectedChoreography: null,
@@ -45,6 +51,14 @@ export const usePracticeStore = create<PracticeStore>((set) => ({
 
   setGrade: (grade: Grade): void => {
     set({ currentGrade: grade });
+  },
+
+  setAccuracyScore: (score: number | null): void => {
+    set({ accuracyScore: score });
+  },
+
+  setTimingScore: (score: number | null): void => {
+    set({ timingScore: score });
   },
 
   setBodyPartScores: (scores: BodyPartScore[]): void => {

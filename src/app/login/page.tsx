@@ -1,0 +1,37 @@
+'use client';
+
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Sparkles } from 'lucide-react';
+import { LoginForm } from '@/components/auth/LoginForm';
+
+export default function LoginPage(): React.ReactElement {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-sm"
+      >
+        <div className="text-center mb-8">
+          <Sparkles className="h-12 w-12 text-primary mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gradient-primary mb-2">
+            DanceFlow
+          </h1>
+          <p className="text-muted-foreground">
+            로그인하여 댄스 연습을 시작하세요
+          </p>
+        </div>
+
+        <LoginForm />
+
+        <p className="text-center text-sm text-muted-foreground mt-6">
+          아직 계정이 없으신가요?{' '}
+          <Link href="/signup" className="text-primary hover:underline">
+            가입하기
+          </Link>
+        </p>
+      </motion.div>
+    </div>
+  );
+}

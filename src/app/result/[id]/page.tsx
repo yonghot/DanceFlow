@@ -18,6 +18,8 @@ export default function ResultPage() {
   const {
     currentScore,
     currentGrade,
+    accuracyScore,
+    timingScore,
     bodyPartScores,
     selectedChoreography,
   } = usePracticeStore();
@@ -56,6 +58,30 @@ export default function ResultPage() {
 
         <GradeMessage grade={currentGrade} />
       </motion.div>
+
+      {accuracyScore !== null && timingScore !== null && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Card className="mb-6">
+            <CardContent className="p-6">
+              <h2 className="font-semibold mb-4">점수 상세</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-primary">{accuracyScore}</p>
+                  <p className="text-xs text-muted-foreground mt-1">동작 정확도</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-accent">{timingScore}</p>
+                  <p className="text-xs text-muted-foreground mt-1">박자 일치도</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {bodyPartScores.length > 0 && (
         <motion.div

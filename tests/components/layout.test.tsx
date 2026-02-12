@@ -12,6 +12,12 @@ vi.mock('next/link', () => ({
 
 vi.mock('next/navigation', () => ({
   usePathname: () => '/',
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
+}));
+
+// useAuth 모킹 (Supabase 의존성 제거)
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: null, isLoading: false, signOut: vi.fn() }),
 }));
 
 describe('Header', () => {

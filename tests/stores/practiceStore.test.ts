@@ -65,8 +65,9 @@ describe('practiceStore', () => {
       artist: 'Artist',
       difficulty: 'beginner' as const,
       duration: 30,
-      referencePoses: [],
-      thumbnailUrl: '',
+      thumbnailUrl: null,
+      audioUrl: null,
+      hasReference: false,
     };
     usePracticeStore.getState().setSelectedChoreography(choreo);
     expect(usePracticeStore.getState().selectedChoreography).toEqual(choreo);

@@ -8,9 +8,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserStore } from '@/stores/userStore';
-import { getPracticeRecords, getStreak } from '@/lib/db/practiceRepo';
-import { getChoreographyById } from '@/lib/data/choreographies';
-import type { PracticeRecord, Grade } from '@/types';
+import { getPracticeSessions, getStreak } from '@/lib/supabase/repos/practiceRepo';
+import { getChoreographyById } from '@/lib/supabase/repos/choreographyRepo';
+import type { PracticeRecord, Grade, Choreography } from '@/types';
 
 const GRADE_COLORS: Record<Grade, string> = {
   perfect: 'text-grade-perfect',
@@ -30,30 +30,42 @@ const GRADE_LABELS: Record<Grade, string> = {
 
 export default function MyPage() {
   const router = useRouter();
-  const user = useUserStore((s) => s.user);
+  const profile = useUserStore((s) => s.profile);
   const [records, setRecords] = useState<PracticeRecord[]>([]);
+  const [choreoMap, setChoreoMap] = useState<Map<string, Choreography>>(new Map());
   const [streak, setStreak] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadData(): Promise<void> {
-      if (!user) {
+      if (!profile) {
         setIsLoading(false);
         return;
       }
 
       const [recs, str] = await Promise.all([
-        getPracticeRecords(user.id),
-        getStreak(user.id),
+        getPracticeSessions(profile.id),
+        getStreak(profile.id),
       ]);
 
+      // 안무 정보 조회 (중복 제거)
+      const uniqueIds = [...new Set(recs.map((r) => r.choreographyId))];
+      const choreos = await Promise.all(
+        uniqueIds.map((id) => getChoreographyById(id))
+      );
+      const map = new Map<string, Choreography>();
+      for (const c of choreos) {
+        if (c) map.set(c.id, c);
+      }
+
       setRecords(recs);
+      setChoreoMap(map);
       setStreak(str);
       setIsLoading(false);
     }
 
     loadData();
-  }, [user]);
+  }, [profile]);
 
   const totalPractices = records.length;
   const avgScore =
@@ -99,7 +111,7 @@ export default function MyPage() {
   return (
     <div className="px-4 py-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">{user?.nickname ?? '게스트'}</h1>
+        <h1 className="text-2xl font-bold">{profile?.nickname ?? '게스트'}</h1>
         <p className="text-sm text-muted-foreground">마이페이지</p>
       </div>
 
@@ -160,7 +172,7 @@ export default function MyPage() {
       ) : (
         <div className="flex flex-col gap-3">
           {records.slice(0, 20).map((record, index) => {
-            const choreo = getChoreographyById(record.choreographyId);
+            const choreo = choreoMap.get(record.choreographyId);
 
             return (
               <motion.div
@@ -176,7 +188,7 @@ export default function MyPage() {
                         {choreo?.title ?? '알 수 없는 안무'}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {record.practicedAt.toLocaleDateString('ko-KR', {
+                        {new Date(record.createdAt).toLocaleDateString('ko-KR', {
                           month: 'short',
                           day: 'numeric',
                           hour: '2-digit',

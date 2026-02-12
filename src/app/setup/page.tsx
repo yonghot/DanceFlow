@@ -5,16 +5,17 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Check, ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useUserStore } from '@/stores/userStore';
 import { useCamera } from '@/hooks/useCamera';
+import { useUserStore } from '@/stores/userStore';
+import { createClient } from '@/lib/supabase/client';
 
 type Step = 'nickname' | 'camera';
 
-export default function OnboardingPage() {
+export default function SetupPage(): React.ReactElement {
   const router = useRouter();
-  const setUser = useUserStore((s) => s.setUser);
+  const profile = useUserStore((s) => s.profile);
   const [step, setStep] = useState<Step>('nickname');
-  const [nickname, setNickname] = useState('');
+  const [nickname, setNickname] = useState(profile?.nickname ?? '');
   const { videoRef, isReady, error, startCamera, stopCamera } = useCamera();
 
   const handleNicknameSubmit = useCallback(() => {
@@ -29,24 +30,28 @@ export default function OnboardingPage() {
     [handleNicknameSubmit]
   );
 
-  const handleComplete = useCallback(() => {
+  const handleComplete = useCallback(async () => {
     stopCamera();
-    setUser({
-      id: crypto.randomUUID(),
-      nickname: nickname.trim(),
-      createdAt: new Date(),
-      settings: {
-        nickname: nickname.trim(),
-        mirrorMode: true,
-        playbackSpeed: 1,
-      },
-    });
+
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // 프로필 업데이트
+    await supabase
+      .from('profiles')
+      .update({ nickname: nickname.trim() })
+      .eq('id', user.id);
+
+    // 로컬 스토어 업데이트
+    const fetchProfile = useUserStore.getState().fetchProfile;
+    await fetchProfile(user.id);
+
     router.replace('/');
-  }, [nickname, stopCamera, setUser, router]);
+  }, [nickname, stopCamera, router]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6">
-      {/* 단계 표시 */}
       <div className="flex gap-2 mb-12">
         {(['nickname', 'camera'] as const).map((s, i) => (
           <div
@@ -70,7 +75,7 @@ export default function OnboardingPage() {
             className="w-full max-w-sm text-center"
           >
             <Sparkles className="h-12 w-12 text-primary mx-auto mb-4" />
-            <h1 className="text-2xl font-bold mb-2">환영합니다!</h1>
+            <h1 className="text-2xl font-bold mb-2">프로필 설정</h1>
             <p className="text-muted-foreground mb-8">
               닉네임을 입력해주세요
             </p>

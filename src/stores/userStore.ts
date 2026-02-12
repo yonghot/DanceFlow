@@ -1,46 +1,90 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import type { User, UserSettings } from '@/types';
+import { createClient } from '@/lib/supabase/client';
+import type { Database } from '@/lib/supabase/types';
 
-interface UserStore {
-  user: User | null;
-  isOnboarded: boolean;
-  setUser: (user: User) => void;
-  updateSettings: (settings: Partial<UserSettings>) => void;
-  setOnboarded: (value: boolean) => void;
+type ProfileRow = Database['public']['Tables']['profiles']['Row'];
+
+export interface Profile {
+  id: string;
+  nickname: string;
+  avatarUrl: string | null;
+  settings: {
+    mirrorMode: boolean;
+    playbackSpeed: number;
+  };
 }
 
-export const useUserStore = create<UserStore>()(
-  persist(
-    (set) => ({
-      user: null,
-      isOnboarded: false,
+interface UserStore {
+  profile: Profile | null;
+  isLoading: boolean;
+  fetchProfile: (userId: string) => Promise<void>;
+  updateProfile: (updates: Partial<Pick<Profile, 'nickname' | 'avatarUrl' | 'settings'>>) => Promise<void>;
+  clearUser: () => void;
+}
 
-      setUser: (user: User): void => {
-        set({ user, isOnboarded: true });
-      },
+export const useUserStore = create<UserStore>()((set, get) => ({
+  profile: null,
+  isLoading: true,
 
-      updateSettings: (settings: Partial<UserSettings>): void => {
-        set((state) => {
-          if (!state.user) return state;
-          return {
-            user: {
-              ...state.user,
-              settings: {
-                ...state.user.settings,
-                ...settings,
-              },
-            },
-          };
-        });
-      },
+  fetchProfile: async (userId: string): Promise<void> => {
+    set({ isLoading: true });
+    const supabase = createClient();
 
-      setOnboarded: (value: boolean): void => {
-        set({ isOnboarded: value });
-      },
-    }),
-    {
-      name: 'danceflow-user',
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .returns<ProfileRow[]>()
+      .single();
+
+    if (error || !data) {
+      set({ profile: null, isLoading: false });
+      return;
     }
-  )
-);
+
+    set({
+      profile: {
+        id: data.id,
+        nickname: data.nickname,
+        avatarUrl: data.avatar_url,
+        settings: data.settings as Profile['settings'],
+      },
+      isLoading: false,
+    });
+  },
+
+  updateProfile: async (updates): Promise<void> => {
+    const { profile } = get();
+    if (!profile) return;
+
+    const supabase = createClient();
+    const dbUpdates: Record<string, unknown> = {};
+
+    if (updates.nickname !== undefined) dbUpdates.nickname = updates.nickname;
+    if (updates.avatarUrl !== undefined) dbUpdates.avatar_url = updates.avatarUrl;
+    if (updates.settings !== undefined) {
+      dbUpdates.settings = { ...profile.settings, ...updates.settings };
+    }
+
+    const { error } = await supabase
+      .from('profiles')
+      .update(dbUpdates)
+      .eq('id', profile.id);
+
+    if (!error) {
+      set({
+        profile: {
+          ...profile,
+          ...updates,
+          settings: updates.settings
+            ? { ...profile.settings, ...updates.settings }
+            : profile.settings,
+        },
+      });
+    }
+  },
+
+  clearUser: (): void => {
+    set({ profile: null, isLoading: false });
+  },
+}));

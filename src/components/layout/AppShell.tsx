@@ -1,32 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { Navigation } from '@/components/layout/Navigation';
-import { useUserStore } from '@/stores/userStore';
+import { useAuth } from '@/hooks/useAuth';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const isOnboarded = useUserStore((s) => s.isOnboarded);
+  const { isLoading } = useAuth();
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
     setIsHydrated(true);
   }, []);
 
-  const isOnboardingPage = pathname === '/onboarding';
-  const isImmersivePage = pathname.startsWith('/practice');
-  const showChrome = !isOnboardingPage && !isImmersivePage;
+  // 인증/설정 관련 페이지는 chrome 없이 렌더링
+  const isAuthPage = pathname === '/login' || pathname === '/signup' || pathname === '/setup';
+  const isImmersivePage = pathname.startsWith('/practice') || pathname.startsWith('/reference');
+  const showChrome = !isAuthPage && !isImmersivePage;
 
-  useEffect(() => {
-    if (isHydrated && !isOnboarded && !isOnboardingPage) {
-      router.replace('/onboarding');
-    }
-  }, [isHydrated, isOnboarded, isOnboardingPage, router]);
-
-  if (!isHydrated) {
+  if (!isHydrated || isLoading) {
     return <div className="min-h-screen bg-background" />;
   }
 

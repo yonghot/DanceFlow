@@ -7,11 +7,12 @@ import { ArrowLeft, Loader2, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCamera } from '@/hooks/useCamera';
 import { usePoseDetection } from '@/hooks/usePoseDetection';
+import { useScore } from '@/hooks/useScore';
+import { useReference } from '@/hooks/useReference';
 import { usePracticeStore } from '@/stores/practiceStore';
 import { useUserStore } from '@/stores/userStore';
-import { useScore } from '@/hooks/useScore';
-import { getChoreographyById } from '@/lib/data/choreographies';
-import { savePracticeRecord } from '@/lib/db/practiceRepo';
+import { getChoreographyById } from '@/lib/supabase/repos/choreographyRepo';
+import { savePracticeSession } from '@/lib/supabase/repos/practiceRepo';
 import {
   JudgementPopup,
   type JudgementType,
@@ -20,7 +21,7 @@ import { ComboCounter } from '@/components/practice/ComboCounter';
 import {
   GRADE_THRESHOLDS,
   type PoseFrame,
-  type PracticeRecord,
+  type Choreography,
   type Grade,
   type BodyPartScore,
   type BodyPartType,
@@ -116,13 +117,25 @@ export default function PracticePage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
-  const choreography = getChoreographyById(id);
+
+  const [choreography, setChoreography] = useState<Choreography | null>(null);
+  const [isLoadingChoreo, setIsLoadingChoreo] = useState(true);
+
+  const {
+    referenceInfo,
+    referenceFrames,
+    isLoading: isLoadingRef,
+  } = useReference(id);
+
+  const { calculateScore } = useScore();
 
   const {
     state: practiceState,
     setState: setPracticeState,
     setScore,
     setGrade,
+    setAccuracyScore,
+    setTimingScore,
     setBodyPartScores,
     setSelectedChoreography,
     reset: resetPractice,
@@ -144,16 +157,15 @@ export default function PracticePage() {
     stopDetection,
   } = usePoseDetection();
 
-  const { calculateScore } = useScore();
-
   const [countdown, setCountdown] = useState(3);
-  const [timeLeft, setTimeLeft] = useState(choreography?.duration ?? 30);
+  const [timeLeft, setTimeLeft] = useState(30);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const posesRef = useRef<PoseFrame[]>([]);
   const practiceStateRef = useRef(practiceState);
   const isFinishingRef = useRef(false);
+  const practiceStartRef = useRef<number>(0);
 
   // 게임 이펙트 상태
   const [currentQuality, setCurrentQuality] = useState(0);
@@ -166,6 +178,19 @@ export default function PracticePage() {
   useEffect(() => {
     practiceStateRef.current = practiceState;
   }, [practiceState]);
+
+  // 안무 데이터 로딩
+  useEffect(() => {
+    async function loadChoreo(): Promise<void> {
+      const data = await getChoreographyById(id);
+      setChoreography(data);
+      if (data) {
+        setTimeLeft(data.duration);
+      }
+      setIsLoadingChoreo(false);
+    }
+    loadChoreo();
+  }, [id]);
 
   // 마운트 시 카메라 시작
   useEffect(() => {
@@ -278,9 +303,9 @@ export default function PracticePage() {
         }
       }
 
-      // 포즈 기록
+      // 포즈 기록 (상대 타임스탬프)
       posesRef.current.push({
-        timestamp: performance.now(),
+        timestamp: performance.now() - practiceStartRef.current,
         landmarks: currentPose.map((lm) => ({ ...lm })),
       });
     }
@@ -308,6 +333,7 @@ export default function PracticePage() {
       if (count <= 0) {
         if (countdownRef.current) clearInterval(countdownRef.current);
         setPracticeState('practicing');
+        practiceStartRef.current = performance.now();
 
         if (videoRef.current) {
           startDetection(videoRef.current);
@@ -338,45 +364,63 @@ export default function PracticePage() {
 
     const poses = posesRef.current;
     const choreo = choreography!;
-    const user = useUserStore.getState().user;
+    const profile = useUserStore.getState().profile;
 
     let totalScore: number;
     let grade: Grade;
     let bodyPartScores: BodyPartScore[];
+    let accuracyScore: number | null = null;
+    let timingScore: number | null = null;
 
-    if (choreo.referencePoses.length > 0) {
-      const result = calculateScore(poses, choreo.referencePoses);
+    if (referenceFrames.length > 0) {
+      // 레퍼런스 비교 평가
+      const result = calculateScore(poses, referenceFrames);
       totalScore = result.totalScore;
       grade = result.grade;
       bodyPartScores = result.bodyPartScores;
+      accuracyScore = result.accuracyScore;
+      timingScore = result.timingScore;
     } else {
+      // 트래킹 품질 기반 평가 (레퍼런스 없을 때)
       const result = calculateTrackingQuality(poses);
       totalScore = result.totalScore;
       grade = result.grade;
       bodyPartScores = result.bodyPartScores;
-      setScore(totalScore);
-      setGrade(grade);
-      setBodyPartScores(bodyPartScores);
     }
 
+    setScore(totalScore);
+    setGrade(grade);
+    setAccuracyScore(accuracyScore);
+    setTimingScore(timingScore);
+    setBodyPartScores(bodyPartScores);
     setSelectedChoreography(choreo);
 
-    if (user) {
-      const record: PracticeRecord = {
-        id: crypto.randomUUID(),
-        userId: user.id,
+    // Supabase에 연습 기록 저장
+    if (profile) {
+      await savePracticeSession({
+        userId: profile.id,
         choreographyId: choreo.id,
+        referenceId: referenceInfo?.id,
         totalScore,
         grade,
+        accuracyScore,
+        timingScore,
         bodyPartScores,
-        duration: choreo.duration,
-        practicedAt: new Date(),
-      };
-      await savePracticeRecord(record);
+        frameCount: poses.length,
+        durationMs: choreo.duration * 1000,
+      });
     }
 
     router.push(`/result/${choreo.id}`);
   };
+
+  if (isLoadingChoreo || isLoadingRef) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!choreography) {
     return (
@@ -501,8 +545,13 @@ export default function PracticePage() {
             <h2 className="text-2xl font-bold text-white mb-2">
               {choreography.title}
             </h2>
-            <p className="text-white/70 mb-8">
+            <p className="text-white/70 mb-2">
               {choreography.artist} · {choreography.duration}초
+            </p>
+            <p className="text-xs text-white/50 mb-6">
+              {referenceFrames.length > 0
+                ? '레퍼런스 비교 모드'
+                : '트래킹 품질 모드'}
             </p>
             <Button
               onClick={handleStart}

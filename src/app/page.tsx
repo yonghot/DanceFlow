@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Clock, Music, ChevronRight } from 'lucide-react';
+import { Clock, Music, ChevronRight, Loader2, Video } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { choreographies } from '@/lib/data/choreographies';
-import type { Difficulty } from '@/types';
+import { getChoreographies } from '@/lib/supabase/repos/choreographyRepo';
+import type { Choreography, Difficulty } from '@/types';
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   beginner: '초급',
@@ -56,6 +56,17 @@ const cardVariants = {
 
 export default function HomePage() {
   const [filter, setFilter] = useState<Difficulty | 'all'>('all');
+  const [choreographies, setChoreographies] = useState<Choreography[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function load(): Promise<void> {
+      const data = await getChoreographies();
+      setChoreographies(data);
+      setIsLoading(false);
+    }
+    load();
+  }, []);
 
   const filtered =
     filter === 'all'
@@ -92,56 +103,79 @@ export default function HomePage() {
         ))}
       </div>
 
-      <motion.div
-        key={filter}
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-      >
-        {filtered.map((choreo) => (
-          <motion.div key={choreo.id} variants={cardVariants}>
-            <Link href={`/practice/${choreo.id}`}>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : (
+        <motion.div
+          key={filter}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
+          {filtered.map((choreo) => (
+            <motion.div key={choreo.id} variants={cardVariants}>
               <motion.div
                 whileHover={{ scale: 1.03, y: -4 }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
               >
-                <Card className="group cursor-pointer transition-colors duration-200 hover:border-primary/50">
-                  <div className="h-40 gradient-energy rounded-t-lg opacity-80 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Music className="h-12 w-12 text-white/60" />
-                  </div>
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                          {choreo.title}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {choreo.artist}
-                        </p>
-                      </div>
-                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0 mt-0.5" />
+                <Card className="group transition-colors duration-200 hover:border-primary/50">
+                  <Link href={`/practice/${choreo.id}`}>
+                    <div className="h-40 gradient-energy rounded-t-lg opacity-80 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                      <Music className="h-12 w-12 text-white/60" />
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant="outline"
-                        className={DIFFICULTY_BADGE_STYLES[choreo.difficulty]}
+                  </Link>
+                  <CardContent className="p-4">
+                    <Link href={`/practice/${choreo.id}`} className="block mb-2">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                            {choreo.title}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {choreo.artist}
+                          </p>
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0 mt-0.5" />
+                      </div>
+                    </Link>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant="outline"
+                          className={DIFFICULTY_BADGE_STYLES[choreo.difficulty]}
+                        >
+                          {DIFFICULTY_LABELS[choreo.difficulty]}
+                        </Badge>
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          {formatDuration(choreo.duration)}
+                        </span>
+                        {choreo.hasReference && (
+                          <Badge variant="outline" className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">
+                            레퍼런스
+                          </Badge>
+                        )}
+                      </div>
+                      <Link
+                        href={`/reference/${choreo.id}/record`}
+                        className="flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 transition-colors"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        {DIFFICULTY_LABELS[choreo.difficulty]}
-                      </Badge>
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock className="h-3 w-3" />
-                        {formatDuration(choreo.duration)}
-                      </span>
+                        <Video className="h-3.5 w-3.5" />
+                        녹화
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>
               </motion.div>
-            </Link>
-          </motion.div>
-        ))}
-      </motion.div>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
     </div>
   );
 }

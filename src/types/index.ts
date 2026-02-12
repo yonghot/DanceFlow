@@ -24,6 +24,13 @@ export interface PoseFrame {
   landmarks: Landmark[];
 }
 
+// 압축된 포즈 데이터 (Storage 전송용)
+export interface CompactPoseData {
+  timestamps: number[];
+  landmarks: number[][]; // 프레임별 [x0,y0,z0,v0, x1,y1,z1,v1, ...]
+  landmarkCount: number;
+}
+
 // 신체 부위 분류
 export type BodyPartType =
   | 'leftArm'
@@ -42,42 +49,32 @@ export interface BodyPartScore {
 // 난이도
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 
-// 안무 정보
+// 안무 정보 (DB 기반)
 export interface Choreography {
   id: string;
   title: string;
   artist: string;
   difficulty: Difficulty;
   duration: number;
-  referencePoses: PoseFrame[];
-  thumbnailUrl: string;
+  thumbnailUrl: string | null;
+  audioUrl: string | null;
+  hasReference: boolean;
 }
 
-// 연습 기록
+// 연습 기록 (Supabase 기반)
 export interface PracticeRecord {
   id: string;
   userId: string;
   choreographyId: string;
+  referenceId: string | null;
   totalScore: number;
   grade: Grade;
+  accuracyScore: number | null;
+  timingScore: number | null;
   bodyPartScores: BodyPartScore[];
-  duration: number;
-  practicedAt: Date;
-}
-
-// 사용자 설정
-export interface UserSettings {
-  nickname: string;
-  mirrorMode: boolean;
-  playbackSpeed: number;
-}
-
-// 사용자 정보
-export interface User {
-  id: string;
-  nickname: string;
-  createdAt: Date;
-  settings: UserSettings;
+  frameCount: number;
+  durationMs: number;
+  createdAt: string;
 }
 
 // 연습 진행 상태
