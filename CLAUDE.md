@@ -1,137 +1,120 @@
 # DanceFlow 개발 지침서
 
-## 기본 원칙
+## 1-1. 언어
 
 - **반드시 한국어로 응답**할 것
 - 코드 주석은 한국어 허용, 변수/함수명은 영어
-- 토큰 효율을 위해 불필요한 예시 코드, 장황한 설명 지양
-- 답변은 간결하고 핵심 위주로
+- 사용자 대면 에러 메시지는 항상 한국어로 변환
 
-## 코드 작성 원칙
+## 1-2. 코드 작성
 
-### 스타일 가이드
+### 스타일
+- Google TypeScript Style Guide 준수
+- 들여쓰기 2 spaces, 세미콜론 사용, 싱글 쿼트 (JSX 속성은 더블 쿼트)
+- ESLint + Prettier 준수, 커밋 전 린트 통과 필수
 
-- **JavaScript/TypeScript**: Google TypeScript Style Guide 준수
-- **CSS**: BEM 네이밍 또는 프레임워크 컨벤션 따름
-- **들여쓰기**: 2 spaces
-- **세미콜론**: 사용
-- **따옴표**: 싱글 쿼트 (JSX 내 속성은 더블 쿼트)
-- **린트**: ESLint + Prettier 설정 준수, 커밋 전 린트 통과 필수
-
-### 네이밍 규칙
-
-- 컴포넌트: PascalCase (`DanceCard.tsx`)
+### 네이밍
+- 컴포넌트/타입: PascalCase (`ScoreDisplay.tsx`)
 - 함수/변수: camelCase (`getUserData`)
 - 상수: UPPER_SNAKE_CASE (`MAX_RETRY_COUNT`)
-- 파일: 컴포넌트는 PascalCase, 유틸리티는 camelCase
-- 타입/인터페이스: PascalCase, 접두사 I 사용하지 않음
+- 파일: 컴포넌트 PascalCase, 유틸리티 camelCase
+- 타입에 접두사 I 사용하지 않음
 
 ### 타입 안전성
+- `any` 금지 → `unknown` + 타입 가드
+- 함수 반환 타입 명시, strict 모드 활성화
+- framer-motion ease 값에는 `as const` 사용 (TS-007)
 
-- `any` 사용 금지, 불가피한 경우 `unknown` + 타입 가드
-- 함수 반환 타입 명시
-- strict 모드 활성화
+## 1-3. 아키텍처 (레이어 구조)
 
-## 모듈화 원칙
+```
+app/           → 라우트, 페이지 컴포넌트 (App Router)
+components/    → UI 컴포넌트 (도메인별: layout, auth, practice, result, score, ui)
+hooks/         → 커스텀 훅 (useCamera, usePoseDetection, useScore, useAuth, useReference)
+stores/        → Zustand 전역 상태 (userStore, practiceStore, poseStore)
+lib/pose/      → 포즈 감지/정규화/압축 (detector, normalizer, compression)
+lib/scoring/   → 스코어링 엔진 (DTW, grading)
+lib/supabase/  → DB 클라이언트/서버/미들웨어/리포지토리
+types/         → 공통 타입 정의
+```
 
-- 모든 기능을 적절한 단위로 분리하여 **독립적 모듈**로 구성
-- 각 모듈은 명확한 이름과 단일 책임을 가질 것 (SRP)
-- 모듈 간 의존성 최소화 → 특정 기능 수정 시 다른 모듈 영향 차단
-- 공통 로직은 `utils/`, `hooks/`, `lib/` 등으로 분리
-- 순환 의존성(circular dependency) 금지
+- 기능/도메인 기준 파일 정리 (파일 타입 기준 X)
+- 모듈 간 단방향 의존: app → components → hooks → lib/stores
+- 순환 의존성 금지, 각 모듈 단일 책임 (SRP)
 
-## 구현 원칙
+### 기술 스택
+- Next.js 14 (App Router) + TypeScript
+- shadcn/ui + Tailwind CSS + framer-motion
+- MediaPipe BlazePose (WebGL/WASM, 클라이언트 전용)
+- Zustand (상태관리) + Supabase (인증/DB/스토리지)
+- 패키지 매니저: pnpm
+
+## 1-4. 최소 구현
 
 - **요청한 내용에 대해서만 최소한으로, 매우 보수적으로 구현**
-- 임의로 "어울릴 만한" 관련 기능을 추가 구현하지 않음
-- YAGNI (You Aren't Gonna Need It) 엄격 적용
-- MVP 우선 → 필요 시 점진적 확장
+- 임의로 관련 기능 추가 구현 금지
 - TODO 주석으로 미완성 코드 남기지 않음
 - 플레이스홀더/목업 데이터 사용 금지
 
-## 디버깅 & 트러블슈팅 원칙
+## 1-5. 트러블슈팅
 
-- 오류 발생 시 **근본 원인(root cause)을 파악**하여 해결
-- 임시 우회(workaround) 방편이 아닌, 동일 오류 재발 방지를 위한 근본 수정
-- 디버깅 순서: 에러 메시지 분석 → 원인 추적 → 근본 수정 → 검증
-- 테스트를 비활성화하거나 건너뛰어서 문제를 회피하지 않음
-- 해결된 트러블슈팅 사례는 아래 섹션에 기록하여 재발 방지
+- 근본 원인(root cause) 파악 후 해결 (임시 우회 금지)
+- 디버깅 순서: 에러 분석 → 원인 추적 → 근본 수정 → 검증
+- 테스트 비활성화/건너뛰기로 문제 회피 금지
+- 해결 사례는 하단 트러블슈팅 로그에 기록
 
-## 프로젝트 기술 스택
+## 1-6. 토큰 효율
 
-- **프레임워크**: Next.js 14 (App Router) + TypeScript
-- **UI**: shadcn/ui + Tailwind CSS
-- **AI/포즈**: MediaPipe BlazePose (WebGL/WASM)
-- **상태관리**: Zustand
-- **로컬DB**: IndexedDB (Dexie.js)
-- **애니메이션**: framer-motion
-- **아이콘**: lucide-react
-- **패키지 매니저**: pnpm
+- 불필요한 예시 코드, 장황한 설명 지양
+- 답변은 간결하고 핵심 위주로
+- 코드 블록은 변경 부분만 표시
 
-## 프로젝트 구조 원칙
+## 1-7. YAGNI
 
-- 파일은 기능/도메인 기준으로 정리 (파일 타입 기준 X)
-- 임시 파일, 디버그 파일은 작업 완료 후 반드시 삭제
-- 테스트 파일은 `tests/` 또는 `__tests__/` 디렉토리에 배치
-- 문서 파일은 프로젝트 루트에 배치
-- 상세 프로젝트 구조는 `PRD.md` 참조
+- YAGNI (You Aren't Gonna Need It) 엄격 적용
+- MVP 우선 → 필요 시 점진적 확장
+- 미래 요구사항 추측 금지
 
-## Git 원칙
+## 1-8. 버전 관리
 
 - 작업 전 `git status`, `git branch` 확인
-- 기능 브랜치에서 작업 (main/master 직접 작업 금지)
-- 의미 있는 단위로 커밋, 명확한 커밋 메시지
+- 기능 브랜치에서 작업 (main 직접 작업 금지)
+- 의미 있는 단위로 커밋, 명확한 한국어 커밋 메시지
 - 커밋 전 `git diff`로 변경 사항 확인
+- 테스트 파일은 `tests/` 디렉토리에 배치
+
+## 1-9. 추가 원칙
+
+> 프로젝트 진행 중 발견되는 추가 원칙을 여기에 기록합니다.
 
 ---
 
 ## 트러블슈팅 로그
 
-> 개발 중 발견된 주요 이슈와 해결 방법을 기록하여 재발을 방지합니다.
-
 ### TS-001: Set spread 에러
-
-- **증상**: `[...new Set()]` 구문에서 TypeScript 컴파일 에러
-- **원인**: tsconfig.json에 `target` 미설정 (기본값 ES5에서 Set iterable 미지원)
+- **증상**: `[...new Set()]`에서 TypeScript 컴파일 에러
 - **해결**: `tsconfig.json`에 `"target": "es2017"` 추가
-- **예방**: ES2015+ 기능 사용 시 target 설정 확인 필수
+- **예방**: ES2015+ 기능 사용 시 target 설정 확인
 
 ### TS-002: 동적 require 타입 에러
-
-- **증상**: `button.tsx`에서 `const { Slot } = require(...)` 사용 시 ref prop 타입 불일치
-- **원인**: 동적 require는 정확한 타입 추론 불가
-- **해결**: `import { Slot } from '@radix-ui/react-slot'` 정적 import로 변경
-- **예방**: 컴포넌트 import는 반드시 정적 ES module import 사용
+- **증상**: `require()` 사용 시 ref prop 타입 불일치
+- **해결**: 정적 ES module import로 변경
+- **예방**: 컴포넌트는 반드시 정적 import
 
 ### TS-003: 빈 interface ESLint 에러
-
-- **증상**: `interface SkeletonProps extends HTMLAttributes {}` → `@typescript-eslint/no-empty-object-type`
-- **해결**: `type SkeletonProps = React.HTMLAttributes<HTMLDivElement>` type alias로 변경
-- **예방**: 빈 interface 대신 type alias 사용
+- **해결**: `type` alias로 변경 (`interface {} → type = React.HTMLAttributes<>`)
 
 ### TS-004: video.play() 중단 에러
-
-- **증상**: 연습 페이지 진입 시 "The play() request was interrupted by a new load request" 에러
-- **원인**: 페이지 이동/언마운트 시 play() Promise가 reject되면서 `AbortError` 발생
-- **해결**: `useCamera.ts`에서 play() 호출을 try-catch로 감싸고 `AbortError`는 무시 처리
-- **예방**: 비동기 미디어 API 호출 시 AbortError 핸들링 필수
+- **해결**: play() try-catch로 감싸고 AbortError 무시
+- **예방**: 비동기 미디어 API에 AbortError 핸들링 필수
 
 ### TS-005: 카메라 에러 원시 메시지 노출
+- **해결**: DOMException 에러명을 한국어 안내로 매핑
 
-- **증상**: 카메라 접근 실패 시 영문 DOMException 메시지가 사용자에게 그대로 표시
-- **해결**: `NotAllowedError`, `NotFoundError`, `NotReadableError`를 한국어 안내 메시지로 매핑
-- **예방**: 사용자 대면 에러는 항상 한국어 메시지로 변환
+### TS-006: vitest v4 + v8 커버리지 0%
+- **해결**: istanbul 프로바이더로 변경
+- **예방**: vitest v4에서는 istanbul 사용
 
-### TS-006: vitest v4 + v8 커버리지 0% 버그
-
-- **증상**: 110개 테스트 통과하지만 v8 커버리지 프로바이더가 모든 파일에 0% 보고
-- **원인**: vitest v4.0.18의 v8 커버리지 프로바이더 호환성 버그
-- **해결**: `@vitest/coverage-istanbul` 설치 후 `vitest.config.ts`에서 `provider: 'istanbul'`로 변경
-- **예방**: vitest v4에서는 istanbul 프로바이더 사용 권장
-
-### TS-007: framer-motion Variants ease 타입 에러
-
-- **증상**: `ease: 'easeOut'`이 Variants 타입에서 `string`으로 추론되어 `Easing` 타입 불일치
-- **원인**: 객체 리터럴의 문자열이 넓은 `string` 타입으로 추론됨
-- **해결**: `ease: 'easeOut' as const`로 리터럴 타입 고정
-- **예방**: framer-motion Variants 객체의 ease 값에는 `as const` 사용
+### TS-007: framer-motion ease 타입 에러
+- **해결**: `ease: 'easeOut' as const`
+- **예방**: Variants 객체 ease 값에 `as const`
