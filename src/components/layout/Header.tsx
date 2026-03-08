@@ -15,23 +15,31 @@ function Header({ className }: HeaderProps) {
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 w-full glass-neon border-b border-neon-pink/10',
+        'sticky top-0 z-50 w-full border-b border-white/5',
         className
       )}
+      style={{
+        background: 'rgba(10, 10, 15, 0.8)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+      }}
     >
-      <div className="flex h-14 items-center justify-between px-4">
+      <div className="section-container flex h-16 items-center justify-between">
         <Link
           href="/"
-          className="flex items-center gap-2 text-xl font-bold"
+          className="flex items-center gap-2.5 text-xl font-bold group"
           aria-label="DanceFlow 홈으로 이동"
         >
-          <Music2 className="h-5 w-5 text-neon-pink animate-neon-pulse" aria-hidden="true" />
-          <span className="neon-text-pink">DanceFlow</span>
+          <Music2
+            className="h-6 w-6 text-neon-pink animate-neon-pulse group-hover:scale-110 transition-transform"
+            aria-hidden="true"
+          />
+          <span className="neon-text-pink tracking-tight">DanceFlow</span>
         </Link>
         <div className="flex items-center gap-1">
           <Link
             href="/mypage"
-            className="flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:text-neon-pink"
+            className="flex items-center justify-center rounded-lg p-2.5 text-muted-foreground transition-all duration-200 hover:text-neon-pink hover:bg-white/5"
             aria-label="마이페이지"
           >
             <User className="h-5 w-5" aria-hidden="true" />
@@ -39,7 +47,7 @@ function Header({ className }: HeaderProps) {
           {user && (
             <button
               onClick={signOut}
-              className="flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:text-neon-pink"
+              className="flex items-center justify-center rounded-lg p-2.5 text-muted-foreground transition-all duration-200 hover:text-neon-pink hover:bg-white/5"
               aria-label="로그아웃"
             >
               <LogOut className="h-5 w-5" aria-hidden="true" />

@@ -13,9 +13,9 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: '\uD648', href: '/', icon: Home },
-  { label: '\uC5F0\uC2B5', href: '/practice', icon: Play, disabled: true },
-  { label: '\uB9C8\uC774', href: '/mypage', icon: User },
+  { label: '홈', href: '/', icon: Home },
+  { label: '연습', href: '/practice', icon: Play, disabled: true },
+  { label: '마이', href: '/mypage', icon: User },
 ];
 
 export interface NavigationProps {
@@ -28,13 +28,18 @@ function Navigation({ className }: NavigationProps) {
   return (
     <nav
       className={cn(
-        'fixed bottom-0 left-0 right-0 z-50 glass border-t border-neon-pink/10',
+        'fixed bottom-0 left-0 right-0 z-50 border-t border-white/5',
         className
       )}
+      style={{
+        background: 'rgba(10, 10, 15, 0.9)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+      }}
       aria-label="메인 내비게이션"
     >
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-neon-pink/50 to-transparent" />
-      <ul className="flex items-center justify-around py-2">
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-neon-pink/30 to-transparent" />
+      <ul className="flex items-center justify-around py-2 pb-safe max-w-lg mx-auto">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -43,11 +48,11 @@ function Navigation({ className }: NavigationProps) {
             return (
               <li key={item.href}>
                 <span
-                  className="flex flex-col items-center gap-1 px-3 py-1 text-muted-foreground/50"
+                  className="flex flex-col items-center gap-1 px-4 py-1.5 text-muted-foreground/40"
                   aria-disabled="true"
                 >
                   <Icon className="h-5 w-5" aria-hidden="true" />
-                  <span className="text-xs">{item.label}</span>
+                  <span className="text-[10px] font-medium">{item.label}</span>
                 </span>
               </li>
             );
@@ -58,17 +63,17 @@ function Navigation({ className }: NavigationProps) {
               <Link
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center gap-1 px-3 py-1 transition-all duration-200',
+                  'relative flex flex-col items-center gap-1 px-4 py-1.5 transition-all duration-200',
                   isActive
-                    ? 'text-neon-pink scale-110'
+                    ? 'text-neon-pink'
                     : 'text-muted-foreground hover:text-neon-pink'
                 )}
                 aria-current={isActive ? 'page' : undefined}
               >
-                <Icon className="h-5 w-5" aria-hidden="true" />
-                <span className="text-xs font-medium">{item.label}</span>
+                <Icon className={cn('h-5 w-5 transition-transform', isActive && 'scale-110')} aria-hidden="true" />
+                <span className="text-[10px] font-medium">{item.label}</span>
                 {isActive && (
-                  <span className="absolute -bottom-0.5 h-1 w-1 rounded-full bg-neon-pink shadow-neon-pink" />
+                  <span className="absolute -bottom-1 h-0.5 w-6 rounded-full gradient-primary shadow-neon-pink" />
                 )}
               </Link>
             </li>

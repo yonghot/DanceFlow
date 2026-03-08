@@ -13,6 +13,15 @@ import { GradeMessage } from '@/components/result/GradeMessage';
 import { ParticleBackground } from '@/components/result/ParticleBackground';
 import { usePracticeStore } from '@/stores/practiceStore';
 
+const sectionVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (delay: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
+  }),
+};
+
 export default function ResultPage() {
   const router = useRouter();
   const {
@@ -35,95 +44,114 @@ export default function ResultPage() {
   }
 
   return (
-    <div className="relative px-4 py-8 max-w-lg mx-auto bg-grid min-h-screen">
+    <div className="relative min-h-screen bg-grid">
       <ParticleBackground grade={currentGrade} />
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 text-center mb-8"
-      >
-        <p className="text-sm text-muted-foreground mb-1">
-          {selectedChoreography.artist}
-        </p>
-        <h1 className="text-xl font-semibold mb-8 neon-text-pink">
-          {selectedChoreography.title}
-        </h1>
-
-        <ScoreDisplay score={currentScore} animate />
-
-        <div className="mt-6">
-          <GradeIndicator grade={currentGrade} size="lg" />
-        </div>
-
-        <GradeMessage grade={currentGrade} />
-      </motion.div>
-
-      {accuracyScore !== null && timingScore !== null && (
+      <div className="relative z-10 section-container py-10 sm:py-16 max-w-lg mx-auto">
+        {/* Song Info */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          custom={0}
+          initial="hidden"
+          animate="visible"
+          variants={sectionVariants}
+          className="text-center mb-10"
         >
-          <Card className="mb-6 glass border-white/5">
-            <CardContent className="p-6">
-              <h2 className="font-semibold mb-4">점수 상세</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center">
-                  <p className="text-3xl font-bold neon-text-pink">{accuracyScore}</p>
-                  <p className="text-xs text-muted-foreground mt-1">동작 정확도</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold neon-text-cyan">{timingScore}</p>
-                  <p className="text-xs text-muted-foreground mt-1">박자 일치도</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <p className="text-sm text-muted-foreground mb-1">
+            {selectedChoreography.artist}
+          </p>
+          <h1 className="text-heading font-bold neon-text-pink">
+            {selectedChoreography.title}
+          </h1>
         </motion.div>
-      )}
 
-      {bodyPartScores.length > 0 && (
+        {/* Score + Grade */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          custom={0.15}
+          initial="hidden"
+          animate="visible"
+          variants={sectionVariants}
+          className="text-center mb-10"
         >
-          <Card className="mb-6 glass border-white/5">
-            <CardContent className="p-6">
-              <h2 className="font-semibold mb-4">부위별 분석</h2>
-              <BodyPartScoreDisplay scores={bodyPartScores} />
-            </CardContent>
-          </Card>
+          <ScoreDisplay score={currentScore} animate />
+          <div className="mt-6">
+            <GradeIndicator grade={currentGrade} size="lg" />
+          </div>
+          <GradeMessage grade={currentGrade} />
         </motion.div>
-      )}
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="flex gap-3"
-      >
-        <Button
-          onClick={() =>
-            router.push(`/practice/${selectedChoreography.id}`)
-          }
-          variant="gradient"
-          className="flex-1"
-          size="lg"
+        {/* Score Details */}
+        {accuracyScore !== null && timingScore !== null && (
+          <motion.div
+            custom={0.3}
+            initial="hidden"
+            animate="visible"
+            variants={sectionVariants}
+          >
+            <Card className="mb-6 glass border-white/5 rounded-xl shadow-premium">
+              <CardContent className="p-6 sm:p-8">
+                <h2 className="font-bold mb-6 text-center text-heading-sm">점수 상세</h2>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="text-center glass rounded-xl p-5">
+                    <p className="text-4xl font-extrabold neon-text-pink">{accuracyScore}</p>
+                    <p className="text-xs text-muted-foreground mt-2">동작 정확도</p>
+                  </div>
+                  <div className="text-center glass rounded-xl p-5">
+                    <p className="text-4xl font-extrabold neon-text-cyan">{timingScore}</p>
+                    <p className="text-xs text-muted-foreground mt-2">박자 일치도</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Body Part Scores */}
+        {bodyPartScores.length > 0 && (
+          <motion.div
+            custom={0.45}
+            initial="hidden"
+            animate="visible"
+            variants={sectionVariants}
+          >
+            <Card className="mb-8 glass border-white/5 rounded-xl shadow-premium">
+              <CardContent className="p-6 sm:p-8">
+                <h2 className="font-bold mb-6 text-heading-sm">부위별 분석</h2>
+                <BodyPartScoreDisplay scores={bodyPartScores} />
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Action Buttons */}
+        <motion.div
+          custom={0.6}
+          initial="hidden"
+          animate="visible"
+          variants={sectionVariants}
+          className="flex gap-3"
         >
-          <RotateCcw className="h-4 w-4 mr-2" />
-          다시 연습
-        </Button>
-        <Button
-          onClick={() => router.push('/')}
-          variant="outline"
-          size="lg"
-        >
-          <Home className="h-4 w-4 mr-2" />
-          홈
-        </Button>
-      </motion.div>
+          <Button
+            onClick={() =>
+              router.push(`/practice/${selectedChoreography.id}`)
+            }
+            variant="gradient"
+            className="flex-1 shadow-neon-pink"
+            size="lg"
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            다시 연습
+          </Button>
+          <Button
+            onClick={() => router.push('/')}
+            variant="outline"
+            size="lg"
+            className="border-white/10"
+          >
+            <Home className="h-4 w-4 mr-2" />
+            홈
+          </Button>
+        </motion.div>
+      </div>
     </div>
   );
 }

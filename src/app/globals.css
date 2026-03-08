@@ -125,6 +125,49 @@
   .touch-manipulation {
     touch-action: manipulation;
   }
+
+  /* Premium section container */
+  .section-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Premium card hover effect */
+  .card-premium {
+    @apply rounded-xl transition-all duration-300;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+
+  .card-premium:hover {
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 45, 120, 0.15);
+    transform: translateY(-4px);
+  }
+
+  /* Gradient overlay for images */
+  .img-overlay {
+    position: relative;
+  }
+
+  .img-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10, 10, 15, 0.8) 0%, rgba(10, 10, 15, 0.4) 40%, transparent 100%);
+    pointer-events: none;
+  }
+
+  /* Hero gradient background */
+  .hero-gradient {
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 45, 120, 0.15), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 50%, rgba(181, 55, 242, 0.1), transparent),
+      radial-gradient(ellipse 60% 40% at 20% 50%, rgba(0, 240, 255, 0.08), transparent);
+  }
+
+  /* Divider line with neon glow */
+  .divider-neon {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 45, 120, 0.3), rgba(0, 240, 255, 0.3), transparent);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

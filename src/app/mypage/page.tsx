@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Trophy, Flame, TrendingUp, Star } from 'lucide-react';
+import { Trophy, Flame, TrendingUp, Star, Music, ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -28,6 +28,15 @@ const GRADE_LABELS: Record<Grade, string> = {
   miss: '다시 도전',
 };
 
+const sectionVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
 export default function MyPage() {
   const router = useRouter();
   const profile = useUserStore((s) => s.profile);
@@ -48,7 +57,6 @@ export default function MyPage() {
         getStreak(profile.id),
       ]);
 
-      // 안무 정보 조회 (중복 제거)
       const uniqueIds = [...new Set(recs.map((r) => r.choreographyId))];
       const choreos = await Promise.all(
         uniqueIds.map((id) => getChoreographyById(id))
@@ -81,138 +89,191 @@ export default function MyPage() {
     {
       icon: Trophy,
       iconColor: 'text-neon-pink',
-      bgColor: 'bg-neon-pink/15',
+      bgColor: 'bg-neon-pink/10',
       value: totalPractices,
       label: '총 연습',
     },
     {
       icon: Flame,
       iconColor: 'text-orange-500',
-      bgColor: 'bg-orange-500/15',
+      bgColor: 'bg-orange-500/10',
       value: `${streak}일`,
       label: '연속 연습',
     },
     {
       icon: TrendingUp,
       iconColor: 'text-neon-cyan',
-      bgColor: 'bg-neon-cyan/15',
+      bgColor: 'bg-neon-cyan/10',
       value: avgScore,
       label: '평균 점수',
     },
     {
       icon: Star,
       iconColor: 'text-neon-gold',
-      bgColor: 'bg-neon-gold/15',
+      bgColor: 'bg-neon-gold/10',
       value: bestScore,
       label: '최고 점수',
     },
   ];
 
   return (
-    <div className="px-4 py-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold neon-text-pink">{profile?.nickname ?? '게스트'}</h1>
-        <p className="text-sm text-muted-foreground">마이페이지</p>
-      </div>
+    <div className="section-container py-8 sm:py-12">
+      {/* Profile Header */}
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={sectionVariants}
+        className="mb-10"
+      >
+        <div className="flex items-center gap-4 mb-2">
+          <div className="w-14 h-14 rounded-full gradient-primary flex items-center justify-center shadow-neon-pink">
+            <span className="text-xl font-bold text-white">
+              {(profile?.nickname ?? '?')[0]}
+            </span>
+          </div>
+          <div>
+            <h1 className="text-heading-sm font-bold">{profile?.nickname ?? '게스트'}</h1>
+            <p className="text-sm text-muted-foreground">마이페이지</p>
+          </div>
+        </div>
+      </motion.div>
 
-      <div className="grid grid-cols-2 gap-3 mb-8">
-        {stats.map((stat, index) => (
+      {/* Stats Grid */}
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: { transition: { staggerChildren: 0.08 } },
+        }}
+        className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12"
+      >
+        {stats.map((stat) => (
           <motion.div
             key={stat.label}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
+            variants={{
+              hidden: { opacity: 0, y: 16 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const } },
+            }}
           >
-            <Card className="glass border-white/5 hover:border-neon-pink/20 transition-all">
-              <CardContent className="flex items-center gap-3 p-4">
-                <div className={`rounded-lg p-2 ${stat.bgColor}`}>
+            <Card className="glass border-white/5 hover:border-neon-pink/20 transition-all duration-300 hover:shadow-card-hover rounded-xl">
+              <CardContent className="flex flex-col items-center gap-2 p-5 text-center">
+                <div className={`rounded-xl p-3 ${stat.bgColor}`}>
                   <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
                 </div>
-                <div>
-                  {isLoading ? (
-                    <Skeleton className="h-7 w-12" />
-                  ) : (
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                  )}
-                  <p className="text-xs text-muted-foreground">{stat.label}</p>
-                </div>
+                {isLoading ? (
+                  <Skeleton className="h-8 w-14" />
+                ) : (
+                  <p className="text-2xl sm:text-3xl font-bold">{stat.value}</p>
+                )}
+                <p className="text-xs text-muted-foreground">{stat.label}</p>
               </CardContent>
             </Card>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
 
-      <h2 className="font-semibold mb-3">최근 연습</h2>
-
-      {isLoading ? (
-        <div className="flex flex-col gap-3">
-          {[1, 2, 3].map((i) => (
-            <Card key={i}>
-              <CardContent className="p-4">
-                <Skeleton className="h-12 w-full" />
-              </CardContent>
-            </Card>
-          ))}
+      {/* Recent Practices */}
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={sectionVariants}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-heading-sm font-bold">최근 연습</h2>
+          {records.length > 0 && (
+            <span className="text-sm text-muted-foreground">{records.length}건</span>
+          )}
         </div>
-      ) : records.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <p className="text-muted-foreground mb-4">
-              아직 연습 기록이 없습니다
-            </p>
-            <Button
-              onClick={() => router.push('/')}
-              variant="gradient"
-              size="sm"
-            >
-              연습 시작하기
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="flex flex-col gap-3">
-          {records.slice(0, 20).map((record, index) => {
-            const choreo = choreoMap.get(record.choreographyId);
 
-            return (
-              <motion.div
-                key={record.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
+        {isLoading ? (
+          <div className="flex flex-col gap-3">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="glass border-white/5 rounded-xl">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-4">
+                    <Skeleton className="h-12 w-12 rounded-lg" />
+                    <div className="flex-1">
+                      <Skeleton className="h-5 w-32 mb-2" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                    <Skeleton className="h-8 w-16" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : records.length === 0 ? (
+          <Card className="glass border-white/5 rounded-xl">
+            <CardContent className="py-16 text-center">
+              <Music className="h-14 w-14 text-muted-foreground/30 mx-auto mb-4" />
+              <p className="text-lg font-medium mb-2">아직 연습 기록이 없습니다</p>
+              <p className="text-sm text-muted-foreground mb-6">
+                첫 번째 댄스를 시작하고 실력을 기록해보세요!
+              </p>
+              <Button
+                onClick={() => router.push('/')}
+                variant="gradient"
+                size="lg"
+                className="shadow-neon-pink"
               >
-                <Card className="glass border-white/5">
-                  <CardContent className="flex items-center justify-between p-4">
-                    <div>
-                      <p className="font-medium">
-                        {choreo?.title ?? '알 수 없는 안무'}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(record.createdAt).toLocaleDateString('ko-KR', {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p
-                        className={`text-lg font-bold ${GRADE_COLORS[record.grade]}`}
-                      >
-                        {record.totalScore}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {GRADE_LABELS[record.grade]}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            );
-          })}
-        </div>
-      )}
+                <Music className="h-4 w-4 mr-2" />
+                연습 시작하기
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {records.slice(0, 20).map((record, index) => {
+              const choreo = choreoMap.get(record.choreographyId);
+
+              return (
+                <motion.div
+                  key={record.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.04, duration: 0.3, ease: 'easeOut' as const }}
+                >
+                  <Card className="glass border-white/5 hover:border-neon-pink/20 transition-all duration-300 rounded-xl group cursor-pointer">
+                    <CardContent className="flex items-center justify-between p-4 sm:p-5">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-lg gradient-energy opacity-60 flex items-center justify-center flex-shrink-0">
+                          <Music className="h-4 w-4 text-white/80" />
+                        </div>
+                        <div>
+                          <p className="font-medium group-hover:text-neon-pink transition-colors">
+                            {choreo?.title ?? '알 수 없는 안무'}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(record.createdAt).toLocaleDateString('ko-KR', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <p className={`text-lg font-bold ${GRADE_COLORS[record.grade]}`}>
+                            {record.totalScore}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {GRADE_LABELS[record.grade]}
+                          </p>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-neon-pink transition-colors" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
+      </motion.div>
     </div>
   );
 }

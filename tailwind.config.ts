@@ -65,7 +65,16 @@ const config: Config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
-        sans: ['Pretendard', 'system-ui', 'sans-serif'],
+        sans: ['Pretendard Variable', 'Pretendard', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        'display-xl': ['4.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '800' }],
+        'display': ['3.75rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'display-sm': ['3rem', { lineHeight: '1.15', letterSpacing: '-0.015em', fontWeight: '700' }],
+        'heading-xl': ['2.25rem', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '700' }],
+        'heading': ['1.875rem', { lineHeight: '1.25', letterSpacing: '-0.01em', fontWeight: '600' }],
+        'heading-sm': ['1.5rem', { lineHeight: '1.3', fontWeight: '600' }],
+        'subheading': ['1.125rem', { lineHeight: '1.5', fontWeight: '500' }],
       },
       keyframes: {
         'score-pop': {
@@ -122,6 +131,9 @@ const config: Config = {
         'neon-cyan': '0 0 10px rgba(0, 240, 255, 0.3), 0 0 30px rgba(0, 240, 255, 0.15)',
         'neon-gold': '0 0 10px rgba(255, 215, 0, 0.3), 0 0 30px rgba(255, 215, 0, 0.15)',
         'neon-pink-lg': '0 0 15px rgba(255, 45, 120, 0.4), 0 0 45px rgba(255, 45, 120, 0.2), 0 0 80px rgba(255, 45, 120, 0.1)',
+        'card-hover': '0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 45, 120, 0.15)',
+        'premium': '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+        'premium-hover': '0 16px 48px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 45, 120, 0.2)',
       },
     },
   },
