@@ -121,6 +121,13 @@
 - `npx next build` ✅ 성공 (ESLint + TypeScript 통과)
 - 모든 P0 페이지 빌드 확인 완료
 
+### 배포 (2026-03-08)
+- **커밋 1**: `1da856e` — docs: 개발 방법론 마이그레이션 및 프로젝트 문서 체계화
+- **커밋 2**: `26dd9f8` — feat: 전체 UI/UX 프리미엄 수준 개선
+- **푸시**: `origin/master` (0fe3323..26dd9f8)
+- **Vercel**: ✅ 프로덕션 자동 배포 완료 (빌드 48초)
+- **배포 URL**: https://danceflow-2q29q640n-sk1597530-3914s-projects.vercel.app
+
 ---
 
 ### 다음 작업 후보
